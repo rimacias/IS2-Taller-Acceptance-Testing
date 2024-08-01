@@ -13,6 +13,9 @@ class Task:
     def __str__(self):
         completed = "completada" if self.completed else "incompleta"
         return f"{self.name}: {self.description} ({completed})"
+    
+    def __eq__(self, other):
+        return self.name == other.name and self.description == other.description
 
 
 class TodoList:
@@ -23,13 +26,21 @@ class TodoList:
         self.tasks.append(task)
         
     def get_task(self, name):
-        return [task for task in self.tasks if task.name == name][0]
+        tasks_by_name = [task for task in self.tasks if task.name == name]
+        if tasks_by_name:
+            return tasks_by_name[0]
+        else:
+            return None
 
-    def remove_task(self, task):
+    def remove_task(self, task_name):
+        task = self.get_task(task_name)
         self.tasks.remove(task)
 
     def remove_completed_tasks(self):
         self.tasks = [task for task in self.tasks if not task.is_completed()]
+    
+    def remove_all_tasks(self):
+        self.tasks = []
 
     def mark_task_completed(self, task):
         task.mark_completed()

@@ -1,97 +1,74 @@
-from behave import *
+# noqa: F405
+from behave import *  # noqa: F403
 from util import Task, TodoList
 
-# Define a To-Do List
-todo_list = TodoList()
 
 
-@given("the To-Do list is empty")
-def step_given(context):
+@given(u'the To-Do list is empty')
+def step_impl(context):
     global todo_list
     todo_list = TodoList()
 
 
-@when("the user marks {string} task as completed")
-def step_when(context, string):
+@when("the user adds a task 'Buy groceries' with description 'Buy milk, eggs, and bread'")
+def step_impl(context):
     global todo_list
-    task = todo_list.get_task(string)
-    todo_list.mark_task_completed(task)
+    todo_list.add_task(Task("Buy milk, eggs, and bread", "Buy groceries"))
 
 
-@then("the To-Do list should contain {string} task mark as completed")
-def step_then(context, string):
+@then("the To-Do list contains one task, 'Buy groceries' with description 'Buy milk, eggs, and bread'")
+def step_impl(context):
     global todo_list
-    assert len(todo_list.get_completed_tasks()) == 1
-    assert todo_list.get_completed_tasks()[0].name == string
+    assert len(todo_list.tasks) == 1
+    assert todo_list.tasks[0].name == "Buy groceries"
+    assert todo_list.tasks[0].description == "Buy milk, eggs, and bread"
 
-
-@given("the To-Do list with task {string} incompleted")
-def step_given(context, string):
-    global todo_list
-    todo_list = TodoList()
-    task = Task("Description", string)
-    todo_list.add_task(task)
-
-
-@when("the user adds a task {string} with description {string}")
-def step_when(context, string, string2):
-    global todo_list
-    task = Task(string2, string)
-    todo_list.add_task(task)
-
-
-@then("the To-Do list contains one task, {string}")
-def step_then(context, string):
-    global todo_list
-    assert len(todo_list.get_all_tasks()) == 1
-    assert todo_list.get_all_tasks()[0].name == string
-
-
-@given("the To-Do list with {string} task is in")
-def step_given(context, string):
+@given("the To-Do list with task 'Buy Groceries' incompleted")
+def step_impl(context):
     global todo_list
     todo_list = TodoList()
-    task = Task("Description", string)
-    todo_list.add_task(task)
+    todo_list.add_task(Task("Buy milk, eggs, and bread", "Buy groceries"))
 
-
-@when("the user deletes {string} task")
-def step_when(context, string):
+@when("the user marks 'Buy Groceries' task as completed")
+def step_impl(context):
     global todo_list
-    task = todo_list.get_task(string)
-    todo_list.remove_task(task)
+    todo_list.tasks[0].mark_completed()
 
-
-@then("the To-Do list should not contain the {string} task")
-def step_then(context, string):
+@then("the To-Do list should contain 'Buy Groceries' task mark as completed")
+def step_impl(context):
     global todo_list
-    contains_task = False
-    for task in todo_list.get_all_tasks():
-        if task.name == string:
-            contains_task = True
-            break
-    assert not contains_task
+    assert todo_list.get_task("Buy groceries").is_completed
 
+@given("the To-Do list with 'Buy Groceries' task in")
+def step_impl(context):
+    global todo_list
+    todo_list = TodoList()
+    todo_list.add_task(Task("Buy milk, eggs, and bread", "Buy groceries"))
+
+@when("the user deletes 'Buy Groceries' task")
+def step_impl(context):
+    global todo_list
+    todo_list.remove_task("Buy groceries")
+
+@then("the To-Do list should not contain the 'Buy Groceries' task")
+def step_impl(context):
+    global todo_list
+    assert todo_list.get_task("Buy groceries") is None
 
 @given("the To-Do list filled with tasks")
-def step_given(context):
+def step_impl(context):
     global todo_list
     todo_list = TodoList()
-    task1 = Task("Description", "Task 1")
-    task2 = Task("Description", "Task 2")
-    task3 = Task("Description", "Task 3")
-    todo_list.add_task(task1)
-    todo_list.add_task(task2)
-    todo_list.add_task(task3)
-
+    todo_list.add_task(Task("Buy milk, eggs, and bread", "Buy groceries"))
+    todo_list.add_task(Task("Math and Science", "Do homework"))
+    todo_list.add_task(Task("Sweep and mop", "Clean house"))
 
 @when("the user clears the list")
-def step_when(context):
+def step_impl(context):
     global todo_list
-    todo_list.remove_completed_tasks()
+    todo_list.remove_all_tasks()
 
-
-@then("the task should be empty")
-def step_then(context):
+@then("the To-Do list should be empty")
+def step_impl(context):
     global todo_list
-    assert len(todo_list.get_completed_tasks()) == 0
+    assert len(todo_list.tasks) == 0
